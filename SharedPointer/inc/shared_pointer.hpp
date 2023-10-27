@@ -12,24 +12,6 @@ namespace smart_pointer
 	class cb;
 
 	template<typename T>
-	class shared_ptr;
-
-	template<typename U>
-	shared_ptr<U> make_shared();
-
-	template<typename U, typename Arg1>
-	shared_ptr <U> make_shared(Arg1 arg1);
-
-	template<typename U, typename Arg1, typename Arg2>
-	shared_ptr<U> make_shared(Arg1 arg1, Arg2 arg2);
-
-	template<typename U, typename Arg1, typename Arg2, typename Arg3>
-	shared_ptr<U> make_shared(Arg1 arg1, Arg2 arg2, Arg3 arg3);
-
-	template<typename U, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-	shared_ptr<U> make_shared(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4);
-
-	template<typename T>
 	class shared_ptr
 	{
 	private:
@@ -99,21 +81,6 @@ namespace smart_pointer
 		{
 			return cb_ptr->get_obj();
 		}
-
-		template<typename U>
-		friend shared_ptr<U> make_shared();
-
-		template<typename U, typename Arg1>
-		friend shared_ptr<U> make_shared(Arg1 arg1);
-		
-		template<typename U, typename Arg1, typename Arg2>
-		friend shared_ptr<U> make_shared(Arg1 arg1, Arg2 arg2);
-
-		template<typename U, typename Arg1, typename Arg2, typename Arg3>
-		friend shared_ptr<U> make_shared(Arg1 arg1, Arg2 arg2, Arg3 arg3);
-
-		template<typename U, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-		friend shared_ptr<U> make_shared(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4);
 	};
 
 	template<typename T>
@@ -124,7 +91,7 @@ namespace smart_pointer
 		my_atomic::atomic<size_t> count;
 		my_atomic::atomic<size_t> weak_count;
 		my_atomic::atomic<size_t> expired;
-		const bool mk_sh; // made shared
+		const bool mk_sh; // using make_shared
 
 		void delete_obj()
 		{
@@ -135,7 +102,6 @@ namespace smart_pointer
 		}
 
 	public:
-		friend class shared_ptr<T>;
 
 		cb(T* ptr, bool mk_sh = false)
 			: obj_ptr(ptr)
@@ -201,21 +167,6 @@ namespace smart_pointer
 		{
 			return weak_count;
 		}
-
-		template<typename U>
-		friend shared_ptr<U> make_shared();
-
-		template<typename U, typename Arg1>
-		friend shared_ptr<U> make_shared(Arg1 arg1);
-
-		template<typename U, typename Arg1, typename Arg2>
-		friend shared_ptr<U> make_shared(Arg1 arg1, Arg2 arg2);
-
-		template<typename U, typename Arg1, typename Arg2, typename Arg3>
-		friend shared_ptr<U> make_shared(Arg1 arg1, Arg2 arg2, Arg3 arg3);
-
-		template<typename U, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-		friend shared_ptr<U> make_shared(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4);
 	};
 
 	void allocate_aligned(size_t sizeof_cb, size_t sizeof_obj, size_t alignof_obj, void*& cb_begin, void*& obj_begin)
