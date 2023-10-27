@@ -124,7 +124,7 @@ namespace smart_pointer
 		my_atomic::atomic<size_t> count;
 		my_atomic::atomic<size_t> weak_count;
 		my_atomic::atomic<size_t> expired;
-		const bool mk_sh;
+		const bool mk_sh; // made shared
 
 		void delete_obj()
 		{
@@ -218,13 +218,19 @@ namespace smart_pointer
 		friend shared_ptr<U> make_shared(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4);
 	};
 
+	void allocate_aligned(size_t sizeof_cb, size_t sizeof_obj, size_t alignof_obj, void*& cb_begin, void*& obj_begin)
+	{
+		cb_begin = ::operator new (sizeof_cb + sizeof_obj + alignof_obj);
+		obj_begin = (cb_begin + sizeof_cb + alignof_obj) - (reinterpret_cast<uintptr_t>(obj_begin)) % alignof_obj;
+	}
+
 	template<typename T>
 	shared_ptr<T> make_shared()
 	{
-		void *cb_begin = ::operator new (sizeof(cb<T>) + sizeof(T) + alignof(T));
+		void* cb_begin = nullptr;
+		void* obj_begin = nullptr;
 
-		void *obj_begin = cb_begin + sizeof(cb<T>) + alignof(T);
-		obj_begin -= (reinterpret_cast<uintptr_t>(obj_begin)) % alignof(T);
+		allocate_aligned(sizeof(cb<T>), sizeof(T), alignof(T), cb_begin, obj_begin);
 
 		T* obj = new(obj_begin) T();
 		cb<T>* cb_ptr = new(cb_begin) cb<T>(obj, true);
@@ -235,10 +241,10 @@ namespace smart_pointer
 	template<typename T, typename Arg1>
 	shared_ptr<T> make_shared(Arg1 arg1)
 	{
-		void* cb_begin = ::operator new (sizeof(cb<T>) + sizeof(T) + alignof(T));
+		void* cb_begin = nullptr;
+		void* obj_begin = nullptr;
 
-		void* obj_begin = cb_begin + sizeof(cb<T>) + alignof(T);
-		obj_begin -= (reinterpret_cast<uintptr_t>(obj_begin)) % alignof(T);
+		allocate_aligned(sizeof(cb<T>), sizeof(T), alignof(T), cb_begin, obj_begin);
 
 		T* obj = new(obj_begin) T(arg1);
 		cb<T>* cb_ptr = new(cb_begin) cb<T>(obj, true);
@@ -249,10 +255,10 @@ namespace smart_pointer
 	template<typename T, typename Arg1, typename Arg2>
 	shared_ptr<T> make_shared(Arg1 arg1, Arg2 arg2)
 	{
-		void* cb_begin = ::operator new (sizeof(cb<T>) + sizeof(T) + alignof(T));
+		void* cb_begin = nullptr;
+		void* obj_begin = nullptr;
 
-		void* obj_begin = cb_begin + sizeof(cb<T>) + alignof(T);
-		obj_begin -= (reinterpret_cast<uintptr_t>(obj_begin)) % alignof(T);
+		allocate_aligned(sizeof(cb<T>), sizeof(T), alignof(T), cb_begin, obj_begin);
 
 		T* obj = new(obj_begin) T(arg1, arg2);
 		cb<T>* cb_ptr = new(cb_begin) cb<T>(obj, true);
@@ -263,10 +269,10 @@ namespace smart_pointer
 	template<typename T, typename Arg1, typename Arg2, typename Arg3>
 	shared_ptr<T> make_shared(Arg1 arg1, Arg2 arg2, Arg3 arg3)
 	{
-		void* cb_begin = ::operator new (sizeof(cb<T>) + sizeof(T) + alignof(T));
+		void* cb_begin = nullptr;
+		void* obj_begin = nullptr;
 
-		void* obj_begin = cb_begin + sizeof(cb<T>) + alignof(T);
-		obj_begin -= (reinterpret_cast<uintptr_t>(obj_begin)) % alignof(T);
+		allocate_aligned(sizeof(cb<T>), sizeof(T), alignof(T), cb_begin, obj_begin);
 
 		T* obj = new(obj_begin) T(arg1, arg2, arg3);
 		cb<T>* cb_ptr = new(cb_begin) cb<T>(obj, true);
@@ -277,10 +283,10 @@ namespace smart_pointer
 	template<typename T, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 	shared_ptr<T> make_shared(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4)
 	{
-		void* cb_begin = ::operator new (sizeof(cb<T>) + sizeof(T) + alignof(T));
+		void* cb_begin = nullptr;
+		void* obj_begin = nullptr;
 
-		void* obj_begin = cb_begin + sizeof(cb<T>) + alignof(T);
-		obj_begin -= (reinterpret_cast<uintptr_t>(obj_begin)) % alignof(T);
+		allocate_aligned(sizeof(cb<T>), sizeof(T), alignof(T), cb_begin, obj_begin);
 
 		T* obj = new(obj_begin) T(arg1, arg2, arg3, arg4);
 		cb<T>* cb_ptr = new(cb_begin) cb<T>(obj, true);
