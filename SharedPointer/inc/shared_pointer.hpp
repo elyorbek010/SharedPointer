@@ -123,13 +123,10 @@ public:
 
 	void decrement_shared()
 	{
-		if (--count == 0) {
+		if (--count == 0) 
+		{
 			expired = true;
 			delete_obj();
-
-			if (weak_count == 0) {
-				delete this;
-			}
 		}
 	}
 
@@ -143,10 +140,10 @@ public:
 		return true;
 	}
 
-	void decrement_weak() {
-		if (--weak_count == 0) {
+	void decrement_weak() 
+	{
+		if (--weak_count == 0) 
 			delete this;
-		}
 	}
 
 	T* get_obj()
