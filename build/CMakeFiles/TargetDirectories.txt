@@ -1,0 +1,12 @@
+/mnt/c/Users/elyor/source/repos/SharedPointer/build/CMakeFiles/edit_cache.dir
+/mnt/c/Users/elyor/source/repos/SharedPointer/build/CMakeFiles/rebuild_cache.dir
+/mnt/c/Users/elyor/source/repos/SharedPointer/build/SharedPointer/CMakeFiles/SharedPointer.dir
+/mnt/c/Users/elyor/source/repos/SharedPointer/build/SharedPointer/CMakeFiles/shared_pointer_tests.dir
+/mnt/c/Users/elyor/source/repos/SharedPointer/build/SharedPointer/CMakeFiles/edit_cache.dir
+/mnt/c/Users/elyor/source/repos/SharedPointer/build/SharedPointer/CMakeFiles/rebuild_cache.dir
+/mnt/c/Users/elyor/source/repos/SharedPointer/build/_deps/catch2-build/CMakeFiles/edit_cache.dir
+/mnt/c/Users/elyor/source/repos/SharedPointer/build/_deps/catch2-build/CMakeFiles/rebuild_cache.dir
+/mnt/c/Users/elyor/source/repos/SharedPointer/build/_deps/catch2-build/src/CMakeFiles/Catch2.dir
+/mnt/c/Users/elyor/source/repos/SharedPointer/build/_deps/catch2-build/src/CMakeFiles/Catch2WithMain.dir
+/mnt/c/Users/elyor/source/repos/SharedPointer/build/_deps/catch2-build/src/CMakeFiles/edit_cache.dir
+/mnt/c/Users/elyor/source/repos/SharedPointer/build/_deps/catch2-build/src/CMakeFiles/rebuild_cache.dir
