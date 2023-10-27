@@ -22,7 +22,7 @@ public:
 		: cb_ptr(new cb(ptr))
 	{ }
 
-	shared_ptr(const shared_ptr<T>& orig)
+	shared_ptr(const shared_ptr& orig)
 	{
 		orig.cb_ptr->increment_shared();
 		cb_ptr = orig.cb_ptr;
@@ -52,7 +52,7 @@ public:
 		return cb_ptr->get_obj();
 	}
 		
-	shared_ptr<T>& operator=(const shared_ptr<T>& rhs)
+	shared_ptr& operator=(const shared_ptr& rhs)
 	{
 		rhs.cb_ptr->increment_shared();
 		this->cb_ptr->decrement_shared();

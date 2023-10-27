@@ -6,14 +6,14 @@ namespace my_atomic
 template<typename T>
 class atomic {
 private:
-	T value;
+	alignas(alignof(T)) T value;
 
 public:
 	atomic()
 		: value(0)
 	{ }
 
-	atomic(const atomic<const T>& orig)
+	atomic(const atomic& orig)
 		: value(orig.value)
 	{ }
 
@@ -24,26 +24,26 @@ public:
 	~atomic() 
 	{ }
 
-	atomic<T>& operator++()
+	atomic& operator++()
 	{
 		__atomic_fetch_add(&value, 1, __ATOMIC_SEQ_CST);
 		return *this;
 	}
 
-	atomic<T> operator++(int) 
+	atomic operator++(int) 
 	{
-		atomic<T> ret(*this);
+		atomic ret(*this);
 		++*this;
 		return ret;
 	}
 
-	atomic<T>& operator--()
+	atomic& operator--()
 	{
 		__atomic_fetch_add(&value, -1, __ATOMIC_SEQ_CST);
 		return *this;
 	}
 
-	atomic<T> operator--(int)
+	atomic operator--(int)
 	{
 		atomic<T> ret(*this);
 		--*this;
@@ -70,21 +70,21 @@ public:
 		return !(*this == rhs);
 	}
 
-	atomic<T>& operator=(const atomic<T>& rhs)
+	atomic& operator=(const atomic& rhs)
 	{
 		T tmp = __atomic_load_n(&rhs.value, __ATOMIC_ACQUIRE);
 		__atomic_store_n(&value, tmp, __ATOMIC_RELEASE);
 		return *this;
 	}
 
-	atomic<T> operator+=(const atomic<T>& rhs)
+	atomic operator+=(const atomic& rhs)
 	{
 		T tmp = __atomic_load_n(&rhs.value, __ATOMIC_ACQUIRE);
 		__atomic_fetch_add(&value, tmp, __ATOMIC_SEQ_CST);
 		return *this;
 	}
 
-	atomic<T> operator-=(const atomic<T>& rhs)
+	atomic operator-=(const atomic& rhs)
 	{
 		T tmp = -__atomic_load_n(&rhs.value, __ATOMIC_ACQUIRE);
 		__atomic_fetch_add(&value, tmp, __ATOMIC_SEQ_CST);
