@@ -95,9 +95,11 @@ namespace smart_pointer
 
 		void delete_obj()
 		{
-			if (mk_sh) 
+			decrement_weak();
+
+			if (mk_sh)
 				obj_ptr->~T();
-			else 
+			else
 				delete obj_ptr;
 		}
 
@@ -107,21 +109,16 @@ namespace smart_pointer
 			: obj_ptr(ptr)
 			, count(1)
 			, weak_count(0)
-			, expired(0)
+			, expired(1)
 			, mk_sh(mk_sh)
 		{}
 
 		~cb()
 		{ }
 
-		bool increment_shared()
+		void increment_shared()
 		{
-			if (!expired)
-				count++;
-			else
-				return false;
-
-			return true;
+			count++;
 		}
 
 		void decrement_shared()
@@ -148,8 +145,7 @@ namespace smart_pointer
 
 		void decrement_weak() {
 			if (--weak_count == 0) {
-				if (expired)
-					delete this;
+				delete this;
 			}
 		}
 
