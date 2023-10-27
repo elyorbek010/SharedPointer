@@ -32,8 +32,9 @@ namespace my_atomic
 
 		atomic<T> operator++(int) 
 		{
-			__atomic_fetch_add(&value, 1, __ATOMIC_SEQ_CST);
-			return *this;
+			atomic<T> ret(*this);
+			++*this;
+			return ret;
 		}
 
 		atomic<T>& operator--()
@@ -44,8 +45,9 @@ namespace my_atomic
 
 		atomic<T> operator--(int)
 		{
-			__atomic_fetch_add(&value, -1, __ATOMIC_SEQ_CST);
-			return *this;
+			atomic<T> ret(*this);
+			--*this;
+			return ret;
 		}
 
 		bool operator==(const atomic<T>& rhs) const
