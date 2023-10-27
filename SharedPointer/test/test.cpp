@@ -2,8 +2,37 @@
 #include <iostream>
 #include <string>
 #include <thread>
+#include <vector>
+#include "unistd.h"
 
 #include "shared_pointer.hpp"
+#include "my_atomic.hpp"
+
+TEST_CASE("check multithreading expression result", "my_atomic") 
+{
+	my_atomic::atomic<long long>cnt;
+
+	auto thread1 = std::thread([&]()
+		{
+			for (long long i = 0; i < 1000000; i++) {
+				cnt++;
+			}
+		}
+	);
+
+	auto thread2 = std::thread([&]()
+		{
+			for (long long i = 0; i < 1000000; i++) {
+				cnt--;
+			}
+		}
+	);
+
+	thread1.join();
+	thread2.join();
+
+	REQUIRE(cnt == 0);
+}
 
 class test_class
 {
@@ -12,6 +41,7 @@ public:
 	float arg2;
 	long long arg3;
 	char arg4;
+	int* ptr;
 
 	test_class() 
 		: arg1(0)
@@ -211,7 +241,6 @@ TEST_CASE("four arguments", "make_shared")
 	REQUIRE(ptr2.use_count() == 1);
 }
 
-/*
 TEST_CASE("use count multithreading", "shared_ptr")
 {
 	smart_pointer::shared_ptr<int> int1_ptr(new int(10));
@@ -220,46 +249,29 @@ TEST_CASE("use count multithreading", "shared_ptr")
 	REQUIRE(int1_ptr.use_count() == 1);
 	REQUIRE(int2_ptr.use_count() == 1);
 
-	auto thread1 = std::thread([int1_ptr, int2_ptr]()
-		{
-			smart_pointer::shared_ptr<int> int_ptr_cpy(int1_ptr);
-			REQUIRE(int1_ptr.use_count() == 2);
-			REQUIRE(int2_ptr.use_count() == 1);
+	std::vector<std::thread> threads;
 
-			int_ptr_cpy = int2_ptr;
-			REQUIRE(int1_ptr.use_count() == 1);
-			REQUIRE(int2_ptr.use_count() == 2);
-		}
-	);
+	for (size_t thread_n = 0; thread_n < 1000; thread_n++) 
+	{
+		threads.push_back(std::thread([=]() 
+			{
+			sleep(1);
 
-	auto thread2 = std::thread([int1_ptr, int2_ptr]()
-		{
-			smart_pointer::shared_ptr<int> int_ptr_cpy(int1_ptr);
-			REQUIRE(int1_ptr.use_count() == 2);
-			REQUIRE(int2_ptr.use_count() == 1);
+			for (size_t iter = 0; iter < 1000; iter++) 
+			{
+				smart_pointer::shared_ptr<int> int_ptr_cpy(int1_ptr);
 
-			int_ptr_cpy = int2_ptr;
-			REQUIRE(int1_ptr.use_count() == 1);
-			REQUIRE(int2_ptr.use_count() == 2);
-		}
-	);
+				int_ptr_cpy = int2_ptr;
+			}
+			}
+		)
+		);
+	}
 
-	auto thread3 = std::thread([int1_ptr, int2_ptr]()
-		{
-			smart_pointer::shared_ptr<int> int_ptr_cpy(int1_ptr);
-			REQUIRE(int1_ptr.use_count() == 2);
-			REQUIRE(int2_ptr.use_count() == 1);
+	// Join threads
+	for (auto& thread : threads)
+		thread.join();
 
-			int_ptr_cpy = int2_ptr;
-			REQUIRE(int1_ptr.use_count() == 1);
-			REQUIRE(int2_ptr.use_count() == 2);
-		}
-	);
-	
-	thread1.join();
-	thread2.join();
-	thread3.join();
-	
 	REQUIRE(int1_ptr.use_count() == 1);
 	REQUIRE(int2_ptr.use_count() == 1);
-}*/
+}
