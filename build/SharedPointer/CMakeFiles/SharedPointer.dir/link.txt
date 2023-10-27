@@ -1,2 +1,0 @@
-/usr/bin/ar qc libSharedPointer.a CMakeFiles/SharedPointer.dir/src/shared_pointer.cpp.o
-/usr/bin/ranlib libSharedPointer.a
