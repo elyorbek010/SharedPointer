@@ -109,7 +109,7 @@ public:
 		: obj_ptr(ptr)
 		, count(1)
 		, weak_count(1)
-		, expired(1)
+		, expired(0)
 		, mk_sh(mk_sh)
 	{}
 
