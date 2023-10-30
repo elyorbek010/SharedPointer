@@ -108,7 +108,7 @@ public:
 	cb(T* ptr, bool mk_sh = false)
 		: obj_ptr(ptr)
 		, count(1)
-		, weak_count(0)
+		, weak_count(1)
 		, expired(1)
 		, mk_sh(mk_sh)
 	{}
