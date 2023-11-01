@@ -95,12 +95,12 @@ private:
 
 	void delete_obj()
 	{
-		decrement_weak();
-
 		if (mk_sh)
 			obj_ptr->~T();
 		else
 			delete obj_ptr;
+
+		decrement_weak();
 	}
 
 public:
