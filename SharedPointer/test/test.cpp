@@ -275,3 +275,39 @@ TEST_CASE("use count multithreading", "shared_ptr")
 	REQUIRE(int1_ptr.use_count() == 1);
 	REQUIRE(int2_ptr.use_count() == 1);
 }
+
+TEST_CASE("weak_ptr lock", "weak_ptr")
+{
+	smart_pointer::shared_ptr<int> sh_ptr(new int(10));
+	REQUIRE(sh_ptr.use_count() == 1);
+	{
+		smart_pointer::weak_ptr<int> wk_ptr(sh_ptr);
+		REQUIRE(sh_ptr.use_count() == 1);
+		REQUIRE(wk_ptr.weak_count() == 1);
+
+		smart_pointer::shared_ptr<int> sh_ptr = wk_ptr.lock();
+		REQUIRE(sh_ptr.use_count() == 2);
+		REQUIRE(wk_ptr.weak_count() == 1);
+	}
+	REQUIRE(sh_ptr.use_count() == 1);
+}
+
+TEST_CASE("weak_ptr count", "smart_ptr")
+{
+	smart_pointer::weak_ptr<int> wp;
+	REQUIRE(wp.weak_count() == 0);
+	{
+		smart_pointer::shared_ptr<int> sp(new int(1000));
+		REQUIRE(sp.use_count() == 1);
+		REQUIRE(sp.weak_count() == 0);
+
+		wp = smart_pointer::weak_ptr(sp); 
+
+		REQUIRE(sp.use_count() == 1);
+		REQUIRE(wp.use_count() == 1);
+
+		REQUIRE(sp.weak_count() == 1);
+		REQUIRE(wp.weak_count() == 1);
+	}                 
+	REQUIRE(wp.weak_count() == 0);
+};
