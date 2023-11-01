@@ -191,7 +191,7 @@ public:
 
 	shared_ptr<T> lock()
 	{
-		if(cb_ptr->get_count())
+		if(!cb_ptr->is_expired())
 			cb_ptr->increment_shared();
 		return shared_ptr<T>(cb_ptr);
 	}
