@@ -192,7 +192,7 @@ public:
 
 	bool is_valid()
 	{
-		if (cb_ptr == nullptr || cb_ptr->is_expired())
+		if (cb_ptr == nullptr || !cb_ptr->obj_exists())
 			return false;
 
 		return true;
@@ -216,8 +216,14 @@ public:
 
 	shared_ptr<T> lock()
 	{
-		if(!cb_ptr->is_expired())
+		if(cb_ptr->obj_exists())
 			cb_ptr->increment_shared();
+
+		if (!cb_ptr->obj_exists()) {
+			return shared_ptr<T>(cb_ptr);
+			cb_ptr->decrement_shared();
+		}
+
 		return shared_ptr<T>(cb_ptr);
 	}
 
@@ -234,7 +240,6 @@ private:
 	T* obj_ptr;
 	my_atomic::atomic<size_t> count;
 	my_atomic::atomic<size_t> weak_count;
-	my_atomic::atomic<size_t> expired;
 	const bool mk_sh; // using make_shared
 
 	void delete_obj()
@@ -244,6 +249,7 @@ private:
 		else
 			delete obj_ptr;
 
+		obj_ptr = nullptr;
 		decrement_weak();
 	}
 
@@ -253,7 +259,6 @@ public:
 		: obj_ptr(ptr)
 		, count(1)
 		, weak_count(1)
-		, expired(0)
 		, mk_sh(mk_sh)
 	{}
 
@@ -268,20 +273,12 @@ public:
 	void decrement_shared()
 	{
 		if (--count == 0) 
-		{
-			expired = true;
 			delete_obj();
-		}
 	}
 
-	bool increment_weak()
+	void increment_weak()
 	{
-		if (!expired)
-			weak_count++;
-		else
-			return false;
-
-		return true;
+		weak_count++;
 	}
 
 	void decrement_weak() 
@@ -305,9 +302,9 @@ public:
 		return weak_count;
 	}
 
-	bool is_expired()
+	bool obj_exists()
 	{
-		return expired;
+		return obj_ptr;
 	}
 };
 
