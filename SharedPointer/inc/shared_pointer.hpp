@@ -12,12 +12,21 @@ template<typename T>
 class cb;
 
 template<typename T>
+class weak_ptr;
+
+template<typename T>
 class shared_ptr
 {
+	friend class weak_ptr<T>;
+
 private:
 	cb<T>* cb_ptr;
 
 public:
+	shared_ptr()
+		: cb_ptr(nullptr)
+	{ }
+
 	shared_ptr(T* ptr)
 		: cb_ptr(new cb(ptr))
 	{ }
@@ -34,28 +43,46 @@ public:
 
 	~shared_ptr()
 	{
-		cb_ptr->decrement_shared();
+		if (cb_ptr != nullptr)
+			cb_ptr->decrement_shared();
 	}
 		
 	size_t use_count() const
 	{
+		if (cb_ptr == nullptr)
+			return 0;
 		return cb_ptr->get_count();
+	}
+
+	size_t weak_count()
+	{
+		if (cb_ptr == nullptr)
+			return 0;
+
+		return cb_ptr->get_weak_count() - 1;
 	}
 
 	size_t unique() const
 	{
+		if (cb_ptr == nullptr)
+			return 0;
+
 		return use_count() == 1;
 	}
 
 	T* get() const
 	{
+		if (cb_ptr == nullptr)
+			return nullptr;
 		return cb_ptr->get_obj();
 	}
 		
 	shared_ptr& operator=(const shared_ptr& rhs)
 	{
 		rhs.cb_ptr->increment_shared();
-		this->cb_ptr->decrement_shared();
+
+		if (cb_ptr != nullptr)
+			this->cb_ptr->decrement_shared();
 
 		cb_ptr = rhs.cb_ptr;
 
@@ -80,6 +107,93 @@ public:
 	const T* operator->() const
 	{
 		return cb_ptr->get_obj();
+	}
+};
+
+template<typename T>
+class weak_ptr
+{
+private:
+	cb<T>* cb_ptr;
+
+public:
+	weak_ptr()
+		: cb_ptr(nullptr)
+	{ }
+
+	weak_ptr(const shared_ptr<T>& obj)
+		: cb_ptr(obj.cb_ptr)
+	{ 
+		if(cb_ptr != nullptr)
+			cb_ptr->increment_weak();
+	}
+
+	weak_ptr(const weak_ptr& obj)
+		: cb_ptr(obj.cb_ptr)
+	{
+		if(cb_ptr != nullptr)
+			cb_ptr->increment_weak();
+	}
+
+	~weak_ptr()
+	{
+		if (cb_ptr != nullptr) 
+			cb_ptr->decrement_weak();
+	}
+
+	size_t use_count()
+	{
+		if (cb_ptr == nullptr)
+			return 0;
+
+		return cb_ptr->get_count();
+	}
+
+	size_t weak_count()
+	{
+		if (cb_ptr == nullptr)
+			return 0;
+
+		return cb_ptr->get_weak_count() - 1;
+	}
+
+	bool is_valid()
+	{
+		if (cb_ptr == nullptr || cb_ptr->is_expired())
+			return false;
+
+		return true;
+	}
+
+	weak_ptr& operator=(const shared_ptr<T>& rhs)
+	{
+		rhs.cb_ptr->increment_weak();
+
+		if(cb_ptr != nullptr)
+			this->cb_ptr->decrement_weak();
+
+		cb_ptr = rhs.cb_ptr;
+
+		return *this;
+	}
+
+	weak_ptr& operator=(const weak_ptr& rhs)
+	{
+		rhs.cb_ptr->increment_weak();
+
+		if(cb_ptr != nullptr)
+			this->cb_ptr->decrement_weak();
+
+		cb_ptr = rhs.cb_ptr;
+
+		return *this;
+	}
+
+	shared_ptr<T> lock()
+	{
+		if(cb_ptr->get_count())
+			cb_ptr->increment_shared();
+		return shared_ptr<T>(cb_ptr);
 	}
 };
 
@@ -159,6 +273,11 @@ public:
 	size_t get_weak_count()
 	{
 		return weak_count;
+	}
+
+	bool is_expired()
+	{
+		return expired;
 	}
 };
 
