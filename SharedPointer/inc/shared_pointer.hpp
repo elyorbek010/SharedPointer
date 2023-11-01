@@ -15,6 +15,24 @@ template<typename T>
 class weak_ptr;
 
 template<typename T>
+class shared_ptr;
+
+template<typename U>
+shared_ptr<U> make_shared();
+
+template<typename U, typename Arg1>
+shared_ptr <U> make_shared(Arg1 arg1);
+
+template<typename U, typename Arg1, typename Arg2>
+shared_ptr<U> make_shared(Arg1 arg1, Arg2 arg2);
+
+template<typename U, typename Arg1, typename Arg2, typename Arg3>
+shared_ptr<U> make_shared(Arg1 arg1, Arg2 arg2, Arg3 arg3);
+
+template<typename U, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+shared_ptr<U> make_shared(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4);
+
+template<typename T>
 class shared_ptr
 {
 	friend class weak_ptr<T>;
@@ -22,6 +40,9 @@ class shared_ptr
 private:
 	cb<T>* cb_ptr;
 
+	shared_ptr(cb<T>* cb_ptr)
+		: cb_ptr(cb_ptr)
+	{ }
 public:
 	shared_ptr()
 		: cb_ptr(nullptr)
@@ -36,10 +57,6 @@ public:
 		orig.cb_ptr->increment_shared();
 		cb_ptr = orig.cb_ptr;
 	}
-
-	shared_ptr(cb<T>* cb_ptr)
-		: cb_ptr(cb_ptr)
-	{ }
 
 	~shared_ptr()
 	{
@@ -109,6 +126,21 @@ public:
 	{
 		std::swap(this->cb_ptr, obj.cb_ptr);
 	}
+
+	template<typename U>
+	friend shared_ptr<U> make_shared();
+
+	template<typename U, typename Arg1>
+	friend shared_ptr<U> make_shared(Arg1 arg1);
+
+	template<typename U, typename Arg1, typename Arg2>
+	friend shared_ptr<U> make_shared(Arg1 arg1, Arg2 arg2);
+
+	template<typename U, typename Arg1, typename Arg2, typename Arg3>
+	friend shared_ptr<U> make_shared(Arg1 arg1, Arg2 arg2, Arg3 arg3);
+
+	template<typename U, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+	friend shared_ptr<U> make_shared(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4);
 };
 
 template<typename T>
