@@ -79,12 +79,8 @@ public:
 		
 	shared_ptr& operator=(const shared_ptr& rhs)
 	{
-		rhs.cb_ptr->increment_shared();
-
-		if (cb_ptr != nullptr)
-			this->cb_ptr->decrement_shared();
-
-		cb_ptr = rhs.cb_ptr;
+		shared_ptr tmp(rhs);
+		tmp.swap(*this);
 
 		return *this;
 	}
@@ -107,6 +103,11 @@ public:
 	const T* operator->() const
 	{
 		return cb_ptr->get_obj();
+	}
+
+	void swap(shared_ptr& obj)
+	{
+		std::swap(this->cb_ptr, obj.cb_ptr);
 	}
 };
 
@@ -167,24 +168,16 @@ public:
 
 	weak_ptr& operator=(const shared_ptr<T>& rhs)
 	{
-		rhs.cb_ptr->increment_weak();
-
-		if(cb_ptr != nullptr)
-			this->cb_ptr->decrement_weak();
-
-		cb_ptr = rhs.cb_ptr;
+		weak_ptr tmp(rhs);
+		tmp.swap(*this);
 
 		return *this;
 	}
 
 	weak_ptr& operator=(const weak_ptr& rhs)
 	{
-		rhs.cb_ptr->increment_weak();
-
-		if(cb_ptr != nullptr)
-			this->cb_ptr->decrement_weak();
-
-		cb_ptr = rhs.cb_ptr;
+		weak_ptr tmp(rhs);
+		tmp.swap(*this);
 
 		return *this;
 	}
@@ -194,6 +187,11 @@ public:
 		if(!cb_ptr->is_expired())
 			cb_ptr->increment_shared();
 		return shared_ptr<T>(cb_ptr);
+	}
+
+	void swap(weak_ptr& obj)
+	{
+		std::swap(this->cb_ptr, obj.cb_ptr);
 	}
 };
 
