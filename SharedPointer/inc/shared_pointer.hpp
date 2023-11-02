@@ -79,7 +79,7 @@ public:
 		return cb_ptr->get_weak_count() - 1;
 	}
 
-	size_t unique() const
+	bool unique() const
 	{
 		if (cb_ptr == nullptr)
 			return 0;
