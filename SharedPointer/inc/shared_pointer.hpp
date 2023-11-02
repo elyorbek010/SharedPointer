@@ -216,15 +216,12 @@ public:
 
 	shared_ptr<T> lock()
 	{
-		if(cb_ptr->obj_exists())
-			cb_ptr->increment_shared();
-
-		if (!cb_ptr->obj_exists()) {
+		if (cb_ptr->increment_shared())
+		{
 			return shared_ptr<T>(cb_ptr);
-			cb_ptr->decrement_shared();
 		}
 
-		return shared_ptr<T>(cb_ptr);
+		return shared_ptr<T>();
 	}
 
 	void swap(weak_ptr& obj)
@@ -265,9 +262,16 @@ public:
 	~cb()
 	{ }
 
-	void increment_shared()
+	bool increment_shared()
 	{
-		count++;
+		size_t expected;
+		do {
+			expected = count;
+			if (expected == 0)
+				return false;
+		} while (!count.cmpnxchg(expected, expected + 1));
+
+		return true;
 	}
 
 	void decrement_shared()
