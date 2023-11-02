@@ -95,6 +95,11 @@ public:
 	{
 		return __atomic_load_n(&value, __ATOMIC_ACQUIRE);
 	}
+
+	bool cmpnxchg(T& expected, T desired)
+	{
+		return  __atomic_compare_exchange_n(&value, &expected, desired, false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
+	}
 };
 };
 
